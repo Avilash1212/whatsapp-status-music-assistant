@@ -1,0 +1,161 @@
+scenario,detected_occasion,detected_moods,rank,title,artist,language
+Birthday wishes — Any,birthday,,1,Candles & Confetti,Mira Lane,English
+Birthday wishes — Any,birthday,,2,Saalgirah Ki Raat,Aarav Sen,Hindi
+Birthday wishes — Any,birthday,,3,Pirandha Naal Paattu,Kavin Raj,Tamil
+Birthday wishes — Any,birthday,,4,Janamdin Di Boliyan,Gurnoor Sandhu,Punjabi
+Birthday wishes — Any,birthday,,5,Puttina Roju Beat,Sai Charan K,Telugu
+Birthday wishes — Any,birthday,,6,Another Year Brighter,The Paper Kites Club,English
+Birthday wishes — Any,birthday,,7,Make A Wish Tonight,Lumen Avenue,English
+Birthday wishes — Any,birthday,,8,Jashn-e-Dosti,Arjun Bhatia,Hindi
+Birthday wishes — Any,birthday,,9,Shubho Jonmodin,Ritoban & The Strays,Bengali
+Birthday wishes — Any,birthday,,10,Maa Ki Muskaan,Ananya Rao,Hindi
+Birthday wishes — English,birthday,,1,Candles & Confetti,Mira Lane,English
+Birthday wishes — English,birthday,,2,Saalgirah Ki Raat,Aarav Sen,Hindi
+Birthday wishes — English,birthday,,3,Another Year Brighter,The Paper Kites Club,English
+Birthday wishes — English,birthday,,4,Make A Wish Tonight,Lumen Avenue,English
+Birthday wishes — English,birthday,,5,Pirandha Naal Paattu,Kavin Raj,Tamil
+Birthday wishes — English,birthday,,6,Janamdin Di Boliyan,Gurnoor Sandhu,Punjabi
+Birthday wishes — English,birthday,,7,Puttina Roju Beat,Sai Charan K,Telugu
+Birthday wishes — English,birthday,,8,Jashn-e-Dosti,Arjun Bhatia,Hindi
+Birthday wishes — English,birthday,,9,Shubho Jonmodin,Ritoban & The Strays,Bengali
+Birthday wishes — English,birthday,,10,Maa Ki Muskaan,Ananya Rao,Hindi
+Party & celebrations — Any,party,,1,Dance Floor Diwali,DJ Neel,Hindi
+Party & celebrations — Any,party,,2,Lights Out Loud,Neon Harbour,English
+Party & celebrations — Any,party,,3,Weekend Mode On,DJ Neel,Hindi
+Party & celebrations — Any,party,,4,Shimmer & Shake,Velvet Echo,English
+Party & celebrations — Any,party,,5,Bhangra Weekend,Harjas Gill,Punjabi
+Party & celebrations — Any,party,,6,Kuthu Machi,Anbu Beats,Tamil
+Party & celebrations — Any,party,,7,Mass Entry,Tej Varma,Telugu
+Party & celebrations — Any,party,,8,Thalaivar Theme,Anbu Beats,Tamil
+Party & celebrations — Any,party,,9,Dhol Baaje Re,Mohit & The Band,Hindi
+Party & celebrations — Any,party,,10,Puttina Roju Beat,Sai Charan K,Telugu
+Party & celebrations — English,party,,1,Lights Out Loud,Neon Harbour,English
+Party & celebrations — English,party,,2,Shimmer & Shake,Velvet Echo,English
+Party & celebrations — English,party,,3,Dance Floor Diwali,DJ Neel,Hindi
+Party & celebrations — English,party,,4,Weekend Mode On,DJ Neel,Hindi
+Party & celebrations — English,party,,5,Candles & Confetti,Mira Lane,English
+Party & celebrations — English,party,,6,Bhangra Weekend,Harjas Gill,Punjabi
+Party & celebrations — English,party,,7,Kuthu Machi,Anbu Beats,Tamil
+Party & celebrations — English,party,,8,Mass Entry,Tej Varma,Telugu
+Party & celebrations — English,party,,9,Thalaivar Theme,Anbu Beats,Tamil
+Party & celebrations — English,party,,10,Dhol Baaje Re,Mohit & The Band,Hindi
+Friends & get-together — Any,friends,,1,Yaari Wali Chai,Arjun Bhatia,Hindi
+Friends & get-together — Any,friends,,2,Mitran Di Mehfil,Jasleen Kaur,Punjabi
+Friends & get-together — Any,friends,,3,"Same Table, Same Jokes",Coastline Radio,English
+Friends & get-together — Any,friends,,4,"Old Gang, New Town",Harbour Lights,English
+Friends & get-together — Any,friends,,5,Snehituda,Raghav Teja,Telugu
+Friends & get-together — Any,friends,,6,Adda Forever,Kolkata Kids,Bengali
+Friends & get-together — Any,friends,,7,Nanbenda Vibe,Siddhu M,Tamil
+Friends & get-together — Any,friends,,8,Rangeela Safar,Mohit & The Band,Hindi
+Friends & get-together — Any,friends,,9,Jashn-e-Dosti,Arjun Bhatia,Hindi
+Friends & get-together — Any,friends,,10,Open Road Summer,Wild Compass,English
+Friends & get-together — Hindi,friends,,1,Yaari Wali Chai,Arjun Bhatia,Hindi
+Friends & get-together — Hindi,friends,,2,Rangeela Safar,Mohit & The Band,Hindi
+Friends & get-together — Hindi,friends,,3,Jashn-e-Dosti,Arjun Bhatia,Hindi
+Friends & get-together — Hindi,friends,,4,Canteen Days,The Backbenchers,Hindi
+Friends & get-together — Hindi,friends,,5,Mitran Di Mehfil,Jasleen Kaur,Punjabi
+Friends & get-together — Hindi,friends,,6,Kitaab Wale Din,The Backbenchers,Hindi
+Friends & get-together — Hindi,friends,,7,"Same Table, Same Jokes",Coastline Radio,English
+Friends & get-together — Hindi,friends,,8,"Old Gang, New Town",Harbour Lights,English
+Friends & get-together — Hindi,friends,,9,Snehituda,Raghav Teja,Telugu
+Friends & get-together — Hindi,friends,,10,Adda Forever,Kolkata Kids,Bengali
+Travel & vacation — Any,travel,,1,Safar Ki Dhoop,Ishaan Kapoor,Hindi
+Travel & vacation — Any,travel,,2,Window Seat,Nomad Hearts,English
+Travel & vacation — Any,travel,,3,Malai Kaathu,Nila Sundar,Tamil
+Travel & vacation — Any,travel,,4,Rangeela Safar,Mohit & The Band,Hindi
+Travel & vacation — Any,travel,,5,Goa Wali Lehar,Beach Theory,Hindi
+Travel & vacation — Any,travel,,6,Open Road Summer,Wild Compass,English
+Travel & vacation — Any,travel,,7,Highway Kudi,Manveer Brar,Punjabi
+Travel & vacation — Any,travel,,8,Pahadon Mein,Aditi Rawat,Hindi
+Travel & vacation — Any,travel,,9,Chill Sunday Mix,Lo-Fi Lantern,English
+Travel & vacation — Any,travel,,10,Monsoon Postcards,Wild Compass,English
+Love & romance — Any,love,,1,Tum Se Hi Shuru,Riya Malhotra,Hindi
+Love & romance — Any,love,,2,Kaadhal Mazhai,Harini V,Tamil
+Love & romance — Any,love,,3,Tumi Ele Tai,Shreya Bose,Bengali
+Love & romance — Any,love,,4,Golden Hour With You,Sienna Rhodes,English
+Love & romance — Any,love,,5,Starlit Terrace,Velvet Echo,English
+Love & romance — Any,love,,6,Barsaat Ki Dhun,Ishaan Kapoor,Hindi
+Love & romance — Any,love,,7,Nuvve Naa Pranam,Vamsi Krishna,Telugu
+Love & romance — Any,love,,8,Slow Dance in Kitchen,Lumen Avenue,English
+Love & romance — Any,love,,9,Dil Ki Diary,Kabir Anand,Hindi
+Love & romance — Any,love,,10,Pahadon Mein,Aditi Rawat,Hindi
+Love & romance — Hindi,love,,1,Tum Se Hi Shuru,Riya Malhotra,Hindi
+Love & romance — Hindi,love,,2,Barsaat Ki Dhun,Ishaan Kapoor,Hindi
+Love & romance — Hindi,love,,3,Dil Ki Diary,Kabir Anand,Hindi
+Love & romance — Hindi,love,,4,Pahadon Mein,Aditi Rawat,Hindi
+Love & romance — Hindi,love,,5,Kaadhal Mazhai,Harini V,Tamil
+Love & romance — Hindi,love,,6,Pehli Baar,Meera Joshi,Hindi
+Love & romance — Hindi,love,,7,Tumi Ele Tai,Shreya Bose,Bengali
+Love & romance — Hindi,love,,8,Golden Hour With You,Sienna Rhodes,English
+Love & romance — Hindi,love,,9,Starlit Terrace,Velvet Echo,English
+Love & romance — Hindi,love,,10,Raat Baaki Hai,Zoya Mirza,Hindi
+Special moments — Any,special,,1,Maa Ki Muskaan,Ananya Rao,Hindi
+Special moments — Any,special,,2,Ninaivugal,Kavin Raj,Tamil
+Special moments — Any,special,,3,Graduation Skies,The Paper Kites Club,English
+Special moments — Any,special,,4,Pehli Baar,Meera Joshi,Hindi
+Special moments — Any,special,,5,First Light,Aurora Tide,English
+Special moments — Any,special,,6,Canteen Days,The Backbenchers,Hindi
+Special moments — Any,special,,7,Shagna Di Raat,Gurnoor Sandhu,Punjabi
+Special moments — Any,special,,8,Kalyanam Vibes,Sai Charan K,Telugu
+Special moments — Any,special,,9,Milestone,Echo Valley,English
+Special moments — Any,special,,10,Another Year Brighter,The Paper Kites Club,English
+Special moments — Hindi,special,,1,Maa Ki Muskaan,Ananya Rao,Hindi
+Special moments — Hindi,special,,2,Pehli Baar,Meera Joshi,Hindi
+Special moments — Hindi,special,,3,Canteen Days,The Backbenchers,Hindi
+Special moments — Hindi,special,,4,Ninaivugal,Kavin Raj,Tamil
+Special moments — Hindi,special,,5,Morning Chai Lo-Fi,Lo-Fi Lantern,Hindi
+Special moments — Hindi,special,,6,Dil Ki Diary,Kabir Anand,Hindi
+Special moments — Hindi,special,,7,Kitaab Wale Din,The Backbenchers,Hindi
+Special moments — Hindi,special,,8,Graduation Skies,The Paper Kites Club,English
+Special moments — Hindi,special,,9,Dhol Baaje Re,Mohit & The Band,Hindi
+Special moments — Hindi,special,,10,First Light,Aurora Tide,English
+"Custom — ""Nostalgic evening with school friends""",friends,nostalgic,1,Yaari Wali Chai,Arjun Bhatia,Hindi
+"Custom — ""Nostalgic evening with school friends""",friends,nostalgic,2,"Old Gang, New Town",Harbour Lights,English
+"Custom — ""Nostalgic evening with school friends""",friends,nostalgic,3,Snehituda,Raghav Teja,Telugu
+"Custom — ""Nostalgic evening with school friends""",friends,nostalgic,4,Adda Forever,Kolkata Kids,Bengali
+"Custom — ""Nostalgic evening with school friends""",friends,nostalgic,5,Canteen Days,The Backbenchers,Hindi
+"Custom — ""Nostalgic evening with school friends""",friends,nostalgic,6,Kitaab Wale Din,The Backbenchers,Hindi
+"Custom — ""Nostalgic evening with school friends""",friends,nostalgic,7,Graduation Skies,The Paper Kites Club,English
+"Custom — ""Nostalgic evening with school friends""",friends,nostalgic,8,Mitran Di Mehfil,Jasleen Kaur,Punjabi
+"Custom — ""Nostalgic evening with school friends""",friends,nostalgic,9,"Same Table, Same Jokes",Coastline Radio,English
+"Custom — ""Nostalgic evening with school friends""",friends,nostalgic,10,Ninaivugal,Kavin Raj,Tamil
+"Custom — ""Peaceful sunset by the beach""",travel,calm|dreamy,1,Window Seat,Nomad Hearts,English
+"Custom — ""Peaceful sunset by the beach""",travel,calm|dreamy,2,Malai Kaathu,Nila Sundar,Tamil
+"Custom — ""Peaceful sunset by the beach""",travel,calm|dreamy,3,Safar Ki Dhoop,Ishaan Kapoor,Hindi
+"Custom — ""Peaceful sunset by the beach""",travel,calm|dreamy,4,Pahadon Mein,Aditi Rawat,Hindi
+"Custom — ""Peaceful sunset by the beach""",travel,calm|dreamy,5,Chill Sunday Mix,Lo-Fi Lantern,English
+"Custom — ""Peaceful sunset by the beach""",travel,calm|dreamy,6,Monsoon Postcards,Wild Compass,English
+"Custom — ""Peaceful sunset by the beach""",travel,calm|dreamy,7,Pother Gaan,Anirban Dutta,Bengali
+"Custom — ""Peaceful sunset by the beach""",travel,calm|dreamy,8,Barsaat Ki Dhun,Ishaan Kapoor,Hindi
+"Custom — ""Peaceful sunset by the beach""",travel,calm|dreamy,9,Goa Wali Lehar,Beach Theory,Hindi
+"Custom — ""Peaceful sunset by the beach""",travel,calm|dreamy,10,Open Road Summer,Wild Compass,English
+"Custom — ""First salary celebration with family""",special,emotional|nostalgic|happy,1,Maa Ki Muskaan,Ananya Rao,Hindi
+"Custom — ""First salary celebration with family""",special,emotional|nostalgic|happy,2,Ninaivugal,Kavin Raj,Tamil
+"Custom — ""First salary celebration with family""",special,emotional|nostalgic|happy,3,Graduation Skies,The Paper Kites Club,English
+"Custom — ""First salary celebration with family""",special,emotional|nostalgic|happy,4,Pehli Baar,Meera Joshi,Hindi
+"Custom — ""First salary celebration with family""",special,emotional|nostalgic|happy,5,First Light,Aurora Tide,English
+"Custom — ""First salary celebration with family""",special,emotional|nostalgic|happy,6,Canteen Days,The Backbenchers,Hindi
+"Custom — ""First salary celebration with family""",special,emotional|nostalgic|happy,7,Shagna Di Raat,Gurnoor Sandhu,Punjabi
+"Custom — ""First salary celebration with family""",special,emotional|nostalgic|happy,8,Kalyanam Vibes,Sai Charan K,Telugu
+"Custom — ""First salary celebration with family""",special,emotional|nostalgic|happy,9,Milestone,Echo Valley,English
+"Custom — ""First salary celebration with family""",special,emotional|nostalgic|happy,10,Another Year Brighter,The Paper Kites Club,English
+"Custom — ""Missing someone who lives far away""",friends,nostalgic|emotional,1,Canteen Days,The Backbenchers,Hindi
+"Custom — ""Missing someone who lives far away""",friends,nostalgic|emotional,2,Yaari Wali Chai,Arjun Bhatia,Hindi
+"Custom — ""Missing someone who lives far away""",friends,nostalgic|emotional,3,"Old Gang, New Town",Harbour Lights,English
+"Custom — ""Missing someone who lives far away""",friends,nostalgic|emotional,4,Snehituda,Raghav Teja,Telugu
+"Custom — ""Missing someone who lives far away""",friends,nostalgic|emotional,5,Graduation Skies,The Paper Kites Club,English
+"Custom — ""Missing someone who lives far away""",friends,nostalgic|emotional,6,Adda Forever,Kolkata Kids,Bengali
+"Custom — ""Missing someone who lives far away""",friends,nostalgic|emotional,7,Mitran Di Mehfil,Jasleen Kaur,Punjabi
+"Custom — ""Missing someone who lives far away""",friends,nostalgic|emotional,8,Kitaab Wale Din,The Backbenchers,Hindi
+"Custom — ""Missing someone who lives far away""",friends,nostalgic|emotional,9,"Same Table, Same Jokes",Coastline Radio,English
+"Custom — ""Missing someone who lives far away""",friends,nostalgic|emotional,10,Ninaivugal,Kavin Raj,Tamil
+"Custom — ""Fun road trip with college friends""",friends,upbeat|nostalgic,1,Nanbenda Vibe,Siddhu M,Tamil
+"Custom — ""Fun road trip with college friends""",friends,upbeat|nostalgic,2,"Old Gang, New Town",Harbour Lights,English
+"Custom — ""Fun road trip with college friends""",friends,upbeat|nostalgic,3,Yaari Wali Chai,Arjun Bhatia,Hindi
+"Custom — ""Fun road trip with college friends""",friends,upbeat|nostalgic,4,Mitran Di Mehfil,Jasleen Kaur,Punjabi
+"Custom — ""Fun road trip with college friends""",friends,upbeat|nostalgic,5,Lights Out Loud,Neon Harbour,English
+"Custom — ""Fun road trip with college friends""",friends,upbeat|nostalgic,6,"Same Table, Same Jokes",Coastline Radio,English
+"Custom — ""Fun road trip with college friends""",friends,upbeat|nostalgic,7,Canteen Days,The Backbenchers,Hindi
+"Custom — ""Fun road trip with college friends""",friends,upbeat|nostalgic,8,Weekend Mode On,DJ Neel,Hindi
+"Custom — ""Fun road trip with college friends""",friends,upbeat|nostalgic,9,Jashn-e-Dosti,Arjun Bhatia,Hindi
+"Custom — ""Fun road trip with college friends""",friends,upbeat|nostalgic,10,Snehituda,Raghav Teja,Telugu

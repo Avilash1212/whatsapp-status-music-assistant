@@ -48,6 +48,20 @@ You can skip suggestions at any point: **Search music manually** or **No music**
 - AI unavailable / timeout → friendly error with Retry, offline quick match, pick an occasion, or manual search (use the *Simulate AI failure* switch to test)
 - Unknown language → language weight omitted, not fabricated
 
+## Evaluation
+
+The prototype was evaluated across **17 test scenarios** (6 occasion categories with language variants, plus 5 custom prompts) on intent relevance, mood relevance, language preference, diversity and overall quality.
+
+| Test | Scenario | Before | After |
+|---|---|---|---|
+| 14 | Peaceful beach sunset | 3.5/5 | 4/5 |
+| 15 | First salary with family | 3.5/5 | 4/5 |
+| 16 | Missing someone far away | 2/5 | 4/5 |
+| 17 | Road trip with college friends | 3.5/5 | 4.5/5 |
+| **Average** | | **3.13/5** | **4.13/5** |
+
+The four weakest custom-prompt scenarios were improved and retested with the same prompts and language settings. Tests 1–13 were not retested. Full methodology, findings, root causes and limitations: **[evaluation/README.md](evaluation/README.md)**.
+
 ## Privacy
 
 The selected photo/video stays in the browser tab. It is never analysed or sent anywhere. Only the typed description is used for intent interpretation.
