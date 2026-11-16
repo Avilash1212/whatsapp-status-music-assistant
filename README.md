@@ -6,7 +6,9 @@ A clickable concept prototype that helps a user pick music for a Status update: 
 
 ## Try it
 
-Open `index.html` in any modern browser — no build step, no dependencies, no API key.
+**▶️ Live demo: https://avilash1212.github.io/whatsapp-status-music-assistant/**
+
+Or download `index.html` and open it in any modern browser — no build step, no dependencies, no API key.
 
 ## User flow
 
