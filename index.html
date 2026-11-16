@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Status Music Assistant — MVP Prototype</title>
+<style>
+:root{
+  --green:#1DAA61; --green-d:#168a4e; --green-l:#D9FDD3; --bg:#F7F5F3; --panel:#fff;
+  --ink:#111B21; --muted:#667781; --line:#E9EDEF; --chip:#F0F2F5; --warn:#B25E09; --warn-bg:#FFF4E5;
+  --err:#C0392B; --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#ECE8E3;color:var(--ink);font-size:15px;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea{font:inherit;color:inherit}
+.layout{min-height:100%;display:flex;align-items:center;justify-content:center;gap:40px;padding:24px}
+/* ---------- Side panel (desktop only) ---------- */
+.side{width:300px;align-self:center}
+.side h1{font-size:22px;line-height:1.25;margin-bottom:8px}
+.side p{color:var(--muted);font-size:14px;line-height:1.5}
+.disclaimer{margin-top:14px;background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.45}
+.steps{list-style:none;margin:22px 0}
+.steps li{display:flex;align-items:center;gap:10px;padding:7px 0;color:var(--muted);font-size:14px}
+.steps li .n{width:24px;height:24px;border-radius:50%;border:1.5px solid #C9D1D5;display:grid;place-items:center;font-size:12px;flex:none}
+.steps li.done{color:var(--ink)} .steps li.done .n{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.steps li.now{color:var(--ink);font-weight:600} .steps li.now .n{background:var(--green);border-color:var(--green);color:#fff}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;padding:10px 0;border-top:1px solid #DAD5CF}
+.switch{width:40px;height:22px;border-radius:11px;background:#C9D1D5;position:relative;flex:none;transition:.2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.switch.on{background:var(--green)} .switch.on::after{left:21px}
+@media (max-width:860px){.side{display:none}.layout{padding:0}}
+/* ---------- Phone ---------- */
+.phone{width:390px;height:820px;max-height:calc(100vh - 48px);background:var(--panel);border-radius:34px;box-shadow:0 0 0 10px #1f2326,0 30px 60px rgba(0,0,0,.25);overflow:hidden;position:relative;display:flex;flex-direction:column}
+@media (max-width:860px){.phone{width:100%;height:100vh;max-height:none;border-radius:0;box-shadow:none}}
+.proto-strip{background:var(--warn-bg);color:var(--warn);font-size:11.5px;text-align:center;padding:5px 8px;flex:none}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--panel);animation:in .22s ease}
+.screen.dark{background:#0B0F11;color:#fff}
+@keyframes in{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.stage{position:relative;flex:1;overflow:hidden}
+.top{display:flex;align-items:center;gap:10px;padding:14px 14px 10px;flex:none}
+.top h2{font-size:20px;font-weight:600;flex:1}
+.top h3{font-size:17px;font-weight:600;flex:1;line-height:1.2}
+.top .sub{font-size:12.5px;color:var(--muted);font-weight:400}
+.icon-btn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none}
+.icon-btn:hover{background:var(--chip)} .dark .icon-btn:hover{background:rgba(255,255,255,.12)}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.foot{flex:none;padding:12px 14px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px;background:var(--panel)}
+.btn{height:46px;border-radius:23px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn.primary{background:var(--green);color:#fff} .btn.primary:hover{background:var(--green-d)}
+.btn.primary:disabled{background:#B9DCC8;cursor:not-allowed}
+.btn.ghost{color:var(--green-d)} .btn.ghost:hover{background:#EEF8F2}
+.btn.line{border:1.5px solid var(--line)}
+.link{color:var(--green-d);font-weight:600;font-size:14px}
+.section-label{font-size:13.5px;color:var(--muted);padding:16px 18px 6px}
+/* bottom nav */
+.nav{display:flex;border-top:1px solid var(--line);flex:none}
+.nav button{flex:1;padding:8px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--muted)}
+.nav button.act{color:var(--ink);font-weight:600}
+.nav .pill{padding:3px 16px;border-radius:14px}
+.nav button.act .pill{background:var(--green-l)}
+/* status rows */
+.row{display:flex;align-items:center;gap:14px;padding:10px 18px;width:100%;text-align:left}
+.row:hover{background:#F5F6F6}
+.av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;font-size:18px;flex:none;position:relative}
+.ring{padding:3px;border-radius:50%;border:2.5px solid var(--green);flex:none}
+.ring.seen{border-color:#C9D1D5}
+.ring .av{width:46px;height:46px;font-size:16px}
+.row .t{font-size:16px} .row .s{font-size:13.5px;color:var(--muted);margin-top:2px}
+.plus{position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:var(--green);border:2px solid #fff;color:#fff;font-size:15px;line-height:15px;text-align:center}
+.fab{position:absolute;right:18px;bottom:78px;width:56px;height:56px;border-radius:16px;background:var(--green);color:#fff;display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+/* media */
+.media{position:absolute;inset:0;display:grid;place-items:center;background-size:cover;background-position:center}
+.media img{width:100%;height:100%;object-fit:contain}
+.media .ph-label{position:absolute;left:12px;top:12px;font-size:11px;background:rgba(0,0,0,.45);color:#fff;padding:4px 8px;border-radius:10px}
+.ph-art{font-size:64px;opacity:.9}
+.samples{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:6px 18px}
+.sample{aspect-ratio:3/4;border-radius:12px;display:grid;place-items:center;font-size:34px;position:relative;border:3px solid transparent}
+.sample.sel{border-color:var(--green)}
+.sample span{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:11px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.upload{margin:12px 18px;border:1.5px dashed #C9D1D5;border-radius:14px;padding:18px;text-align:center;color:var(--muted);font-size:14px;cursor:pointer;display:block}
+.upload:hover{border-color:var(--green);background:#F6FCF8}
+.upload b{color:var(--green-d)}
+.note{margin:10px 18px;font-size:12.5px;color:var(--muted);line-height:1.45;display:flex;gap:8px}
+/* editor overlay controls */
+.ed-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:8px;padding:12px;background:linear-gradient(rgba(0,0,0,.45),transparent);z-index:2}
+.ed-tool{height:38px;padding:0 14px;border-radius:19px;background:rgba(0,0,0,.45);color:#fff;display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
+.ed-tool.hl{background:var(--green)}
+.ed-bottom{position:absolute;left:0;right:0;bottom:0;padding:14px;display:flex;align-items:center;gap:10px;background:linear-gradient(transparent,rgba(0,0,0,.6));z-index:2}
+.caption{flex:1;height:44px;border-radius:22px;background:rgba(30,36,40,.85);color:#fff;border:0;padding:0 16px;outline:none}
+.send{width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;flex:none}
+.music-sticker{position:absolute;left:50%;transform:translateX(-50%);bottom:96px;background:rgba(255,255,255,.95);color:var(--ink);border-radius:14px;padding:8px 12px 8px 8px;display:flex;align-items:center;gap:10px;z-index:2;max-width:86%;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.music-sticker .art{width:36px;height:36px;border-radius:8px;flex:none}
+.music-sticker .tt{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.music-sticker .aa{font-size:12px;color:var(--muted)}
+/* sheet */
+.sheet-wrap{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;z-index:5;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:#fff;color:var(--ink);width:100%;border-radius:22px 22px 0 0;max-height:94%;display:flex;flex-direction:column;animation:up .25s ease}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+.grab{width:40px;height:4px;border-radius:2px;background:#D1D7DB;margin:8px auto 0}
+.occ-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 18px 8px}
+.occ{border:1.5px solid var(--line);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;text-align:left;font-size:14.5px;font-weight:500;min-height:58px}
+.occ:hover{border-color:#BFE6CF}
+.occ .e{font-size:22px}
+.occ.sel{border-color:var(--green);background:#F0FBF4;box-shadow:inset 0 0 0 1px var(--green)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:4px 18px}
+.chip{padding:7px 13px;border-radius:16px;background:var(--chip);font-size:13.5px}
+.chip.sel{background:var(--green-l);color:var(--green-d);font-weight:600}
+.other-box{margin:6px 18px 4px}
+.other-box textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;resize:none;height:76px;outline:none;font-size:14.5px}
+.other-box textarea:focus{border-color:var(--green)}
+.other-box .meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+.err{color:var(--err)!important}
+.alert{margin:8px 18px;padding:10px 12px;border-radius:12px;font-size:13.5px;line-height:1.45}
+.alert.warn{background:var(--warn-bg);color:#7A4207}
+.alert.info{background:#EEF6FB;color:#24526E}
+.alert .acts{display:flex;gap:14px;margin-top:8px;flex-wrap:wrap}
+/* results */
+.intent{margin:0 18px 6px;padding:10px 12px;border-radius:12px;background:#F0FBF4;font-size:13px;line-height:1.5}
+.intent b{font-weight:600}
+.intent .src{color:var(--muted);font-size:12px}
+.track{display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid #F3F4F5}
+.rank{width:18px;font-size:12px;color:var(--muted);text-align:center;flex:none}
+.art{width:48px;height:48px;border-radius:10px;flex:none;display:grid;place-items:center;color:rgba(255,255,255,.9);font-size:20px;position:relative;overflow:hidden}
+.art .eq{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;gap:3px;padding-bottom:12px}
+.eq i{width:4px;background:#fff;border-radius:2px;animation:eq .8s ease-in-out infinite}
+.eq i:nth-child(2){animation-delay:.2s}.eq i:nth-child(3){animation-delay:.4s}
+@keyframes eq{0%,100%{height:6px}50%{height:22px}}
+.tinfo{flex:1;min-width:0}
+.tinfo .tt{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tinfo .aa{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.tag{font-size:11px;padding:2px 7px;border-radius:8px;background:var(--chip);color:#3B4A54}
+.tag.fit{background:#E3F7EA;color:var(--green-d)}
+.tag.trend{background:#FFF1E0;color:#9A5300}
+.tag.why{background:none;color:var(--muted);text-decoration:underline;cursor:pointer;padding:2px 0}
+.breakdown{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+.play{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;flex:none}
+.play.on{border-color:var(--green);color:var(--green-d)}
+.sel-btn{height:32px;padding:0 14px;border-radius:16px;background:var(--green);color:#fff;font-size:13px;font-weight:600;flex:none}
+.actions-row{display:flex;gap:8px;padding:6px 18px 10px;overflow-x:auto}
+.actions-row .chip{white-space:nowrap;display:flex;align-items:center;gap:6px;font-weight:500}
+.fine{font-size:11.5px;color:var(--muted);padding:12px 18px 18px;line-height:1.45}
+/* loading */
+.skel{display:flex;gap:12px;padding:12px 18px;align-items:center}
+.skel .b{background:linear-gradient(90deg,#F0F2F5,#E4E8EB,#F0F2F5);background-size:200% 100%;animation:sh 1.2s infinite;border-radius:8px}
+@keyframes sh{to{background-position:-200% 0}}
+.loading-msg{text-align:center;color:var(--muted);font-size:13.5px;padding:18px 0 6px}
+/* segment */
+.seg-hero{display:flex;flex-direction:column;align-items:center;padding:18px 18px 4px;text-align:center}
+.seg-hero .art{width:132px;height:132px;border-radius:18px;font-size:48px}
+.seg-hero .tt{font-size:19px;font-weight:600;margin-top:14px}
+.seg-hero .aa{color:var(--muted);font-size:14px;margin-top:2px}
+.sim-badge{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;background:var(--warn-bg);color:#7A4207;padding:4px 10px;border-radius:10px}
+.wave-wrap{margin:22px 18px 6px;position:relative;height:84px;user-select:none;touch-action:none}
+.wave{position:absolute;inset:0;display:flex;align-items:center;gap:2px}
+.wave i{flex:1;background:#D1D7DB;border-radius:2px}
+.wave i.in{background:var(--green)}
+.wave i.played{background:var(--green-d)}
+.window{position:absolute;top:-4px;bottom:-4px;border:2.5px solid var(--green);border-radius:10px;background:rgba(29,170,97,.08);cursor:grab}
+.window:active{cursor:grabbing}
+.window::before,.window::after{content:"";position:absolute;top:50%;width:6px;height:26px;margin-top:-13px;background:var(--green);border-radius:3px}
+.window::before{left:-4px}.window::after{right:-4px}
+.seg-times{display:flex;justify-content:space-between;margin:0 18px;font-size:12.5px;color:var(--muted)}
+.seg-ctrl{display:flex;align-items:center;justify-content:center;gap:18px;margin:16px 0 4px}
+.big-play{width:58px;height:58px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center}
+.nudge{width:42px;height:42px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-size:12px;font-weight:600}
+.seg-len{display:flex;justify-content:center;gap:8px;margin:10px 0}
+/* status viewer */
+.bars{position:absolute;top:10px;left:10px;right:10px;height:3px;border-radius:2px;background:rgba(255,255,255,.35);z-index:3;overflow:hidden}
+.bars i{display:block;height:100%;width:0;background:#fff;animation:prog 15s linear infinite}
+@keyframes prog{to{width:100%}}
+.viewer-head{position:absolute;top:20px;left:0;right:0;display:flex;align-items:center;gap:10px;padding:8px 10px;z-index:3;color:#fff}
+.viewer-head .av{width:38px;height:38px;font-size:14px}
+.preview-card{position:absolute;left:12px;right:12px;bottom:86px;background:rgba(0,0,0,.6);border-radius:14px;padding:12px 14px;color:#fff;font-size:13px;line-height:1.55;z-index:3}
+.preview-card b{font-weight:600}
+/* modal */
+.modal-wrap{position:absolute;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:9;padding:24px;animation:fade .2s}
+.modal{background:#fff;color:var(--ink);border-radius:20px;padding:24px 20px 16px;text-align:center;width:100%;animation:up .25s}
+.modal .ok{width:64px;height:64px;border-radius:50%;background:var(--green-l);color:var(--green-d);display:grid;place-items:center;margin:0 auto 12px}
+.modal h4{font-size:18px;margin-bottom:6px}
+.modal p{color:var(--muted);font-size:14px;line-height:1.5;margin-bottom:14px}
+/* menu */
+.menu{position:absolute;top:56px;right:12px;background:#fff;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:6px 0;z-index:8;width:250px}
+.menu .toggle{padding:10px 14px;border:0}
+.menu .mi{padding:10px 14px;font-size:14px;width:100%;text-align:left}
+.menu .mi:hover{background:var(--chip)}
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:#2B3439;color:#fff;font-size:13px;padding:9px 14px;border-radius:10px;z-index:20;max-width:90%;text-align:center;animation:fade .2s}
+.search{margin:4px 14px 8px;display:flex;align-items:center;gap:10px;background:var(--chip);border-radius:22px;padding:0 14px;height:44px}
+.search input{flex:1;border:0;background:none;outline:none;font-size:15px}
+.empty{text-align:center;color:var(--muted);padding:40px 24px;font-size:14px;line-height:1.5}
+.hide{display:none!important}
+.viewer .ph-label{top:auto;bottom:170px}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="side">
+    <h1>Status Music Assistant</h1>
+    <p>MVP prototype: occasion-based music recommendations for a Status update — built from the PRD (v1.0, 16 Nov 2026).</p>
+    <div class="disclaimer"><b>Concept prototype.</b> Not affiliated with or endorsed by WhatsApp or Meta. Nothing is posted, no audio plays, and the song catalogue, contacts and trend values are fictional.</div>
+    <ol class="steps" id="steps"></ol>
+    <div class="toggle"><span>Simulate AI (LLM) failure<br><small style="color:var(--muted)">Tests the fallback for “Other”</small></span><button class="switch" data-tg="llmFail" aria-label="Simulate LLM failure"></button></div>
+    <div class="toggle"><span>Show score breakdown<br><small style="color:var(--muted)">Explainable ranking</small></span><button class="switch" data-tg="showWhy" aria-label="Show score breakdown"></button></div>
+  </aside>
+  <div class="phone">
+    <div class="proto-strip">Concept prototype · not affiliated with WhatsApp · simulated only</div>
+    <div class="stage" id="app"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1. MOCK CATALOGUE  (fictional titles & artists; illustrative scores)
+   fields: id, title, artist, language, occasion_tags, mood_tags, energy,
+           popularity_score, trend_score, duration (sec)
+   ============================================================ */
+const RAW = [
+// title, artist, language, occasions, moods, energy, pop, trend
+["Saalgirah Ki Raat","Aarav Sen","Hindi","birthday party","happy upbeat","high",82,74],
+["Another Year Brighter","The Paper Kites Club","English","birthday special","happy nostalgic","medium",71,58],
+["Candles & Confetti","Mira Lane","English","birthday party","happy upbeat","high",77,81],
+["Pirandha Naal Paattu","Kavin Raj","Tamil","birthday","happy upbeat","medium",69,72],
+["Shubho Jonmodin","Ritoban & The Strays","Bengali","birthday special","happy emotional","medium",58,49],
+["Janamdin Di Boliyan","Gurnoor Sandhu","Punjabi","birthday party","energetic happy","high",74,79],
+["Make A Wish Tonight","Lumen Avenue","English","birthday love","dreamy happy","low",63,55],
+["Puttina Roju Beat","Sai Charan K","Telugu","birthday party","energetic upbeat","high",66,70],
+["Dance Floor Diwali","DJ Neel","Hindi","party","energetic upbeat","high",88,90],
+["Lights Out Loud","Neon Harbour","English","party friends","energetic upbeat","high",84,86],
+["Kuthu Machi","Anbu Beats","Tamil","party friends","energetic happy","high",79,88],
+["Bhangra Weekend","Harjas Gill","Punjabi","party friends","energetic happy","high",86,83],
+["Raat Baaki Hai","Zoya Mirza","Hindi","party love","upbeat romantic","medium",73,64],
+["Shimmer & Shake","Velvet Echo","English","party","energetic upbeat","high",70,77],
+["Dhol Baaje Re","Mohit & The Band","Hindi","party special","energetic happy","high",76,68],
+["Mass Entry","Tej Varma","Telugu","party","energetic","high",72,80],
+["Adda Forever","Kolkata Kids","Bengali","friends","nostalgic happy","medium",61,52],
+["Yaari Wali Chai","Arjun Bhatia","Hindi","friends","happy nostalgic","medium",78,73],
+["Old Gang, New Town","Harbour Lights","English","friends travel","upbeat nostalgic","medium",67,60],
+["Nanbenda Vibe","Siddhu M","Tamil","friends party","happy upbeat","high",75,84],
+["Canteen Days","The Backbenchers","Hindi","friends special","nostalgic emotional","low",69,57],
+["Mitran Di Mehfil","Jasleen Kaur","Punjabi","friends party","happy upbeat","medium",71,69],
+["Snehituda","Raghav Teja","Telugu","friends","happy nostalgic","medium",60,62],
+["Same Table, Same Jokes","Coastline Radio","English","friends","happy upbeat","medium",64,66],
+["Safar Ki Dhoop","Ishaan Kapoor","Hindi","travel","dreamy calm","medium",80,71],
+["Open Road Summer","Wild Compass","English","travel friends","upbeat happy","high",79,76],
+["Malai Kaathu","Nila Sundar","Tamil","travel special","calm dreamy","low",62,59],
+["Pahadon Mein","Aditi Rawat","Hindi","travel love","dreamy romantic","low",74,67],
+["Window Seat","Nomad Hearts","English","travel","calm dreamy","low",72,69],
+["Goa Wali Lehar","Beach Theory","Hindi","travel party","upbeat happy","high",76,82],
+["Pother Gaan","Anirban Dutta","Bengali","travel","calm nostalgic","low",55,47],
+["Highway Kudi","Manveer Brar","Punjabi","travel friends","upbeat energetic","high",73,75],
+["Tum Se Hi Shuru","Riya Malhotra","Hindi","love","romantic dreamy","low",87,80],
+["Golden Hour With You","Sienna Rhodes","English","love special","romantic calm","low",83,78],
+["Kaadhal Mazhai","Harini V","Tamil","love","romantic dreamy","low",78,74],
+["Tomake Chai","Shreya Bose","Bengali","love","romantic emotional","low",66,58],
+["Ishq Di Gal","Prabh Sidhu","Punjabi","love party","romantic upbeat","medium",77,79],
+["Nuvve Naa Pranam","Vamsi Krishna","Telugu","love","romantic emotional","low",68,65],
+["Slow Dance in Kitchen","Lumen Avenue","English","love","romantic calm","low",70,63],
+["Dil Ki Diary","Kabir Anand","Hindi","love special","romantic nostalgic","low",72,60],
+["First Light","Aurora Tide","English","special","emotional calm","low",65,54],
+["Pehli Baar","Meera Joshi","Hindi","special love","emotional romantic","low",74,66],
+["Graduation Skies","The Paper Kites Club","English","special friends","nostalgic emotional","medium",68,62],
+["Maa Ki Muskaan","Ananya Rao","Hindi","special birthday","emotional happy","low",76,63],
+["Ninaivugal","Kavin Raj","Tamil","special friends","nostalgic emotional","low",63,56],
+["Notun Shuru","Ritoban & The Strays","Bengali","special","emotional calm","medium",54,48],
+["Shagna Di Raat","Gurnoor Sandhu","Punjabi","special party love","happy upbeat","high",79,77],
+["Milestone","Echo Valley","English","special","upbeat happy","medium",66,64],
+["Kalyanam Vibes","Sai Charan K","Telugu","special party","happy energetic","high",70,73],
+["Monsoon Postcards","Wild Compass","English","travel special","calm nostalgic","low",59,52],
+["Chill Sunday Mix","Lo-Fi Lantern","English","friends travel","calm dreamy","low",65,71],
+["Barsaat Ki Dhun","Ishaan Kapoor","Hindi","love travel","romantic calm","low",75,70],
+["Weekend Mode On","DJ Neel","Hindi","party friends","energetic upbeat","high",80,85],
+["Thalaivar Theme","Anbu Beats","Tamil","party special","energetic","high",77,72],
+["Kitaab Wale Din","The Backbenchers","Hindi","friends special","nostalgic calm","low",62,50],
+["Starlit Terrace","Velvet Echo","English","love party","dreamy romantic","medium",64,66],
+["Rangeela Safar","Mohit & The Band","Hindi","travel friends","happy upbeat","medium",68,65],
+["Tumi Ele Tai","Shreya Bose","Bengali","love special","romantic dreamy","low",57,53],
+["Jashn-e-Dosti","Arjun Bhatia","Hindi","friends birthday","happy energetic","high",72,76],
+["Morning Chai Lo-Fi","Lo-Fi Lantern","Hindi","special travel","calm","low",58,61]
+];
+const GRADS=[["#FF7A59","#FFB36B"],["#7F5AF0","#2CB1FF"],["#1DAA61","#9BE15D"],["#FF5F8F","#FFA8C5"],["#2B5876","#4E4376"],["#F7971E","#FFD200"],["#11998E","#38EF7D"],["#C33764","#1D2671"],["#00B4DB","#0083B0"],["#E96443","#904E95"]];
+const EMOJI={birthday:"🎂",party:"🎉",friends:"🤝",travel:"✈️",love:"💞",special:"✨"};
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+const CATALOGUE = RAW.map((r,i)=>({
+  id:"trk_"+String(i+1).padStart(3,"0"), title:r[0], artist:r[1], language:r[2],
+  occasion_tags:r[3].split(" "), mood_tags:r[4].split(" "), energy:r[5],
+  popularity_score:r[6], trend_score:r[7], duration:150+hash(r[0])%90,
+  grad:GRADS[hash(r[1])%GRADS.length]
+}));
+const LANGS=["Hindi","English","Tamil","Bengali","Punjabi","Telugu"];
+
+/* ============================================================
+   2. OCCASIONS + INTENT INTERPRETATION
+   ============================================================ */
+const OCCASIONS=[
+ {key:"birthday",label:"Birthday wishes",e:"🎂",mood:["happy","upbeat"],energy:"high"},
+ {key:"party",label:"Party & celebrations",e:"🎉",mood:["energetic","upbeat"],energy:"high"},
+ {key:"friends",label:"Friends & get-together",e:"🤝",mood:["happy","nostalgic","upbeat"],energy:"medium"},
+ {key:"travel",label:"Travel & vacation",e:"✈️",mood:["dreamy","calm","upbeat"],energy:"medium"},
+ {key:"love",label:"Love & romance",e:"💞",mood:["romantic","dreamy"],energy:"low"},
+ {key:"special",label:"Special moments",e:"✨",mood:["emotional","nostalgic","happy"],energy:"low"},
+ {key:"other",label:"Other",e:"✏️"}
+];
+const OCC=Object.fromEntries(OCCASIONS.map(o=>[o.key,o]));
+const KW={
+ occasion:{
+  birthday:["birthday","bday","b'day","born","turns","turning","cake","candles","janamdin","anniversary"],
+  party:["party","celebrat","dance","club","night out","festival","diwali","holi","wedding","sangeet","concert","dj","new year"],
+  friends:["friend","gang","buddies","bestie","bff","college","school","reunion","squad","get-together","hangout","hang out","day out","cousins","office","team","colleague"],
+  travel:["travel","trip","vacation","holiday","beach","mountain","hills","road","flight","goa","manali","trek","journey","explore","sunset","weekend away"],
+  love:["love","romantic","date","partner","wife","husband","girlfriend","boyfriend","bae","crush","valentine","proposal","engaged"],
+  special:["graduat","promotion","new job","achievement","milestone","first","parents","mom","mother","dad","father","baby","family","festival","proud","farewell","memories"]
+ },
+ mood:{
+  upbeat:["fun","exciting","awesome","lit","hype","cheer"],
+  happy:["happy","joy","smile","blessed","grateful","great"],
+  energetic:["dance","party","crazy","wild","energy","lit"],
+  calm:["calm","peace","chill","relax","quiet","slow","lazy","sunday"],
+  dreamy:["dream","sunset","rain","monsoon","sky","stars","night"],
+  romantic:["love","romantic","date","heart"],
+  nostalgic:["memories","old","throwback","miss","reunion","college","school","childhood"],
+  emotional:["emotional","proud","farewell","goodbye","tears","miss","grateful"]
+ }
+};
+const MOOD_ENERGY={energetic:"high",upbeat:"high",happy:"medium",nostalgic:"medium",romantic:"low",calm:"low",dreamy:"low",emotional:"low"};
+
+function interpretRuleBased(text){
+  const t=" "+text.toLowerCase()+" ";
+  const occScore={};
+  for(const [k,words] of Object.entries(KW.occasion)) for(const w of words) if(t.includes(w)) occScore[k]=(occScore[k]||0)+1;
+  const moods=[];
+  for(const [m,words] of Object.entries(KW.mood)) if(words.some(w=>t.includes(w))) moods.push(m);
+  let lang=null; for(const l of LANGS) if(t.includes(l.toLowerCase())) lang=l;
+  const ranked=Object.entries(occScore).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
+  let occasion=ranked[0]?.[0]||null;
+  // mood-only text → map to closest occasion
+  if(!occasion && moods.length){
+    const m2o={romantic:"love",dreamy:"travel",calm:"travel",nostalgic:"friends",emotional:"special",energetic:"party",upbeat:"friends",happy:"special"};
+    occasion=m2o[moods[0]];
+  }
+  if(!occasion) return {vague:true, suggestions:suggestFor(t)};
+  const mood=moods.length?moods:OCC[occasion].mood;
+  const energy=MOOD_ENERGY[mood[0]]||OCC[occasion].energy;
+  return {occasion, theme:labelTheme(occasion), mood, energy, language:lang, confidence:ranked[0]?(ranked[0][1]>1?"high":"medium"):"low"};
+}
+function labelTheme(k){return {birthday:"birthday",party:"celebration",friends:"friendship",travel:"travel",love:"romance",special:"special moment"}[k]}
+function suggestFor(){return ["friends","special","party"]}
+
+// Simulated LLM call. No API key in this static prototype → falls back to rules.
+function interpretIntent(text){
+  return new Promise((res,rej)=>setTimeout(()=>{
+    if(S.llmFail) return rej(new Error("timeout"));
+    res({...interpretRuleBased(text), source:"rules"});
+  },700));
+}
+
+/* ============================================================
+   3. RANKING  (45% occasion · 20% mood · 15% language · 20% trend)
+   ============================================================ */
+const W={occasion:.45,mood:.20,language:.15,trend:.20};
+function scoreTrack(trk,ctx,refresh){
+  const occ = trk.occasion_tags[0]===ctx.occasion?1 : trk.occasion_tags.includes(ctx.occasion)?0.8:0;
+  const overlap = ctx.mood.filter(m=>trk.mood_tags.includes(m)).length/Math.max(1,Math.min(ctx.mood.length,2));
+  const mood = 0.75*Math.min(1,overlap) + 0.25*(trk.energy===ctx.energy?1:0);
+  const pop = (0.5*trk.popularity_score+0.5*trk.trend_score)/100;
+  const parts={occasion:occ,mood,trend:pop};
+  let wsum=W.occasion+W.mood+W.trend;
+  if(ctx.language){ parts.language = trk.language===ctx.language?1:0; wsum+=W.language; }   // unknown language → omitted & re-normalised
+  let s=0; for(const k in parts) s+=W[k]*parts[k];
+  s/=wsum;
+  const jitter = refresh? ((hash(trk.id+":"+refresh)%1000)/1000)*0.09 : 0;   // deterministic variety on refresh
+  return {score:s+jitter, parts, wsum};
+}
+function recommend(ctx,refresh=0){
+  return CATALOGUE.map(t=>({t,...scoreTrack(t,ctx,refresh)}))
+    .sort((a,b)=>b.score-a.score || a.t.id.localeCompare(b.t.id))   // tie-breaker: id
+    .filter((x,i,arr)=>arr.findIndex(y=>y.t.id===x.t.id)===i)
+    .slice(0,10);
+}
+
+/* ============================================================
+   4. STATE + RENDER
+   ============================================================ */
+const CONTACTS=[ // fictional
+ {n:"Riya Kapoor",t:"Today, 9:42 am",c:"#E67E22"},{n:"Dev Iyer",t:"Today, 8:15 am",c:"#8E44AD"},
+ {n:"Book Club",t:"Today, 7:30 am",c:"#16A085"}];
+const SEEN=[{n:"Tanvi Rao",t:"Yesterday, 10:05 pm",c:"#2980B9"},{n:"Sameer K",t:"Yesterday, 6:48 pm",c:"#C0392B"}];
+const SAMPLES=[
+ {k:"s1",label:"Sample · Cake",e:"🎂",g:["#FFB36B","#FF7A59"]},
+ {k:"s2",label:"Sample · Beach",e:"🏖️",g:["#00B4DB","#7FDBDA"]},
+ {k:"s3",label:"Sample · Friends",e:"🥳",g:["#7F5AF0","#2CB1FF"]}];
+
+const S={screen:"home",media:null,occ:null,otherText:"",lang:null,ctx:null,intent:null,recs:[],refresh:0,
+  playing:null,track:null,segStart:30,segLen:15,segPlay:0,posted:false,llmFail:false,showWhy:false,menu:false,
+  otherErr:"",recState:"idle",recError:null,vague:null,searchQ:"",from:"recs",whyOpen:{}};
+const $=s=>document.querySelector(s);
+const app=$("#app");
+let playTimer=null;
+
+const I={
+ back:'<svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/></svg>',
+ close:'<svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg>',
+ dots:'<svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M12 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4m0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/></svg>',
+ play:'<svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>',
+ pause:'<svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>',
+ music:'<svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3v10.6A4 4 0 1 0 14 17V7h4V3z"/></svg>',
+ send:'<svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M2 21 23 12 2 3v7l15 2-15 2z"/></svg>',
+ search:'<svg width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.8l-.3-.3A6.5 6.5 0 1 0 14 15.5l.3.3v.8l5 5 1.5-1.5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9"/></svg>',
+ refresh:'<svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M17.6 6.4A8 8 0 1 0 19.7 14h-2.1a6 6 0 1 1-1.4-6.2L13 11h7V4z"/></svg>',
+ cam:'<svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4M9 2 7.2 4H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3.2L15 2z"/></svg>',
+ check:'<svg width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>',
+ chat:'<svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v12H5.2L4 17.2zm0-2a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/></svg>',
+ status:'<svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 2.5"/></svg>',
+ calls:'<svg width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/></svg>'
+};
+const art=(t,size)=>`<div class="art" style="background:linear-gradient(135deg,${t.grad[0]},${t.grad[1]})${size?`;width:${size}px;height:${size}px`:""}">${EMOJI[t.occasion_tags[0]]}${S.playing===t.id?'<div class="eq"><i></i><i></i><i></i></div>':""}</div>`;
+const fmt=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,"0")}`;
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function go(screen){stopPlay();S.screen=screen;S.menu=false;render()}
+function toast(msg){const d=document.createElement("div");d.className="toast";d.textContent=msg;app.appendChild(d);setTimeout(()=>d.remove(),2200)}
+
+function mediaHTML(){
+  const m=S.media;
+  if(!m) return `<div class="media" style="background:#1f2326"></div>`;
+  if(m.type==="upload") return `<div class="media" style="background:#000">${m.kind==="video"?`<video src="${m.url}" muted loop autoplay playsinline style="width:100%;height:100%;object-fit:contain"></video>`:`<img src="${m.url}" alt="Your selected media">`}</div>`;
+  return `<div class="media" style="background:linear-gradient(160deg,${m.g[0]},${m.g[1]})"><div class="ph-art">${m.e}</div><div class="ph-label">${m.label} (placeholder)</div></div>`;
+}
+
+/* ---------- Screens ---------- */
+const V={};
+V.home=()=>`
+ <div class="screen">
+  <div class="top"><h2>Updates</h2><button class="icon-btn" data-a="search-manual-home" title="Search">${I.search}</button><button class="icon-btn" data-a="menu">${I.dots}</button></div>
+  <div class="scroll">
+   <div class="section-label" style="padding-top:2px;font-size:17px;color:var(--ink);font-weight:600">Status</div>
+   <button class="row" data-a="create">
+     <div class="av" style="background:#8696A0">You<span class="plus">+</span></div>
+     <div><div class="t">My status</div><div class="s">${S.posted?"Just now · simulated in prototype":"Tap to add status update"}</div></div>
+   </button>
+   <div class="section-label">Recent updates</div>
+   ${CONTACTS.map(c=>`<div class="row"><div class="ring"><div class="av" style="background:${c.c}">${c.n.split(" ").map(x=>x[0]).join("").slice(0,2)}</div></div><div><div class="t">${c.n}</div><div class="s">${c.t}</div></div></div>`).join("")}
+   <div class="section-label">Viewed updates</div>
+   ${SEEN.map(c=>`<div class="row"><div class="ring seen"><div class="av" style="background:${c.c}">${c.n.split(" ").map(x=>x[0]).join("").slice(0,2)}</div></div><div><div class="t">${c.n}</div><div class="s">${c.t}</div></div></div>`).join("")}
+   <p class="fine">Contacts above are fictional placeholders.</p>
+  </div>
+  <button class="fab" data-a="create" title="Create Status">${I.cam}</button>
+  <div class="nav">
+   <button>${I.chat}<span>Chats</span></button>
+   <button class="act"><span class="pill">${I.status}</span><span>Updates</span></button>
+   <button>${I.calls}<span>Calls</span></button>
+  </div>
+ </div>`;
+
+V.setup=()=>`
+ <div class="screen">
+  <div class="top"><button class="icon-btn" data-a="home">${I.close}</button><h3>Create Status<div class="sub">Step 1 · Choose a photo or video</div></h3></div>
+  <div class="scroll">
+   <label class="upload"><input type="file" accept="image/*,video/*" id="file" hidden>
+     ${I.cam}<div style="margin-top:6px"><b>Choose from device</b><br>Image or short video</div></label>
+   <div class="section-label">Or use a sample placeholder</div>
+   <div class="samples">${SAMPLES.map(s=>`<button class="sample ${S.media?.k===s.k?"sel":""}" data-a="sample" data-k="${s.k}" style="background:linear-gradient(160deg,${s.g[0]},${s.g[1]})">${s.e}<span>${s.label.split("· ")[1]}</span></button>`).join("")}</div>
+   ${S.media?.type==="upload"?`<div class="alert info">Selected: <b>${esc(S.media.name)}</b></div>`:""}
+   <div class="note">🔒 <span>Your media stays in this browser tab. It is never analysed or sent to any AI service — recommendations use only the occasion you pick or the text you type.</span></div>
+  </div>
+  <div class="foot"><button class="btn primary" data-a="to-editor" ${S.media?"":"disabled"}>Continue</button></div>
+ </div>`;
+
+V.editor=()=>`
+ <div class="screen dark">
+  ${mediaHTML()}
+  <div class="ed-top">
+    <button class="icon-btn" style="color:#fff" data-a="setup">${I.close}</button><div style="flex:1"></div>
+    <button class="ed-tool ${S.track?"":"hl"}" data-a="open-assistant">${I.music}${S.track?"Change music":"Add music"}</button>
+  </div>
+  ${S.track?`<div class="music-sticker">${art(S.track,36)}<div style="min-width:0"><div class="tt">${esc(S.track.title)}</div><div class="aa">${esc(S.track.artist)} · ${fmt(S.segStart)}–${fmt(S.segStart+S.segLen)}</div></div></div>`:""}
+  <div class="ed-bottom"><input class="caption" placeholder="Add a caption…" id="cap" value="${esc(S.caption||"")}"><button class="send" data-a="to-preview" title="Preview">${I.send}</button></div>
+  ${S.screenSheet?sheetHTML():""}
+ </div>`;
+
+function sheetHTML(){
+  const other=S.occ==="other";
+  const canGo = S.occ && (!other || S.otherText.trim().length>0);
+  return `<div class="sheet-wrap" data-a="close-sheet-bg"><div class="sheet" data-stop>
+   <div class="grab"></div>
+   <div class="top" style="padding-top:8px"><h3>What's this Status about?<div class="sub">Optional — helps us suggest music that fits</div></h3><button class="icon-btn" data-a="close-sheet">${I.close}</button></div>
+   <div class="scroll">
+    <div class="occ-grid">${OCCASIONS.map(o=>`<button class="occ ${S.occ===o.key?"sel":""}" data-a="occ" data-k="${o.key}" aria-pressed="${S.occ===o.key}"><span class="e">${o.e}</span>${o.label}</button>`).join("")}</div>
+    ${other?`<div class="other-box">
+       <textarea id="other" maxlength="160" placeholder="e.g. A fun day out with college friends">${esc(S.otherText)}</textarea>
+       <div class="meta"><span class="${S.otherErr?"err":""}" id="otherHelp">${S.otherErr||"Describe it in a few words. Only this text is used."}</span><span id="cnt">${S.otherText.length}/160</span></div></div>`:""}
+    <div class="section-label">Song language (optional)</div>
+    <div class="chips">${[null,...LANGS].map(l=>`<button class="chip ${S.lang===l?"sel":""}" data-a="lang" data-l="${l||""}">${l||"Any"}</button>`).join("")}</div>
+    <div style="height:10px"></div>
+   </div>
+   <div class="foot">
+    <button class="btn primary" data-a="get-recs" ${canGo?"":"disabled"}>Show recommendations</button>
+    <div style="display:flex;justify-content:space-between;padding:0 6px"><button class="link" data-a="manual">Skip · Search music manually</button><button class="link" style="color:var(--muted)" data-a="no-music">No music</button></div>
+   </div>
+  </div></div>`;
+}
+
+V.recs=()=>{
+  const c=S.ctx; const head = c?(c.custom?`Songs for “${esc(c.custom.length>34?c.custom.slice(0,32)+"…":c.custom)}”`:`${OCC[c.occasion].e} ${OCC[c.occasion].label}`):"Recommendations";
+  let body="";
+  if(S.recState==="loading"){
+    body=`<div class="loading-msg">${c?.custom?"Understanding your description…":"Finding songs that fit…"}</div>`+Array(6).fill(0).map(()=>`<div class="skel"><div class="b" style="width:48px;height:48px"></div><div style="flex:1"><div class="b" style="height:12px;width:70%"></div><div class="b" style="height:10px;width:45%;margin-top:8px"></div></div></div>`).join("");
+  } else if(S.recState==="error"){
+    body=`<div class="alert warn"><b>We couldn't understand that right now.</b><br>The AI helper didn't respond. You can try again, pick an occasion instead, or search manually.
+      <div class="acts"><button class="link" data-a="retry">Retry</button><button class="link" data-a="use-rules">Use quick match (offline)</button><button class="link" data-a="change">Pick an occasion</button><button class="link" data-a="manual">Search manually</button></div></div>`;
+  } else if(S.recState==="vague"){
+    body=`<div class="alert info"><b>Could you add a little more context?</b><br>“${esc(c.custom)}” is a bit open-ended. Add a word or two about the moment, or choose one of these:
+      <div class="acts">${S.vague.map(k=>`<button class="link" data-a="pick-sugg" data-k="${k}">${OCC[k].e} ${OCC[k].label}</button>`).join("")}</div>
+      <div class="acts"><button class="link" data-a="change">Edit description</button><button class="link" data-a="manual">Search manually</button></div></div>`;
+  } else {
+    const it=S.intent;
+    body=`${it?`<div class="intent">Interpreted as: <b>${it.theme}</b> · mood <b>${it.mood.slice(0,2).join(", ")}</b> · energy <b>${it.energy}</b>${it.language?` · language <b>${it.language}</b>`:""}<div class="src">${it.source==="rules"?"Quick match (rule-based) — no AI key configured in this prototype":"Interpreted by AI"}</div></div>`:""}
+     <div class="actions-row">
+      <button class="chip" data-a="refresh">${I.refresh} Refresh</button>
+      <button class="chip" data-a="change">Change occasion</button>
+      <button class="chip" data-a="manual">${I.search.replace(/20/g,"16")} Search manually</button>
+     </div>
+     ${S.recs.map((r,i)=>trackRow(r,i)).join("")}
+     <p class="fine">Showing ${S.recs.length} songs from a fictional sample catalogue. “Trending” and popularity labels are illustrative mock values — not real-time or actual WhatsApp data. Previews are simulated; no audio plays.</p>`;
+  }
+  return `<div class="screen">
+   <div class="top"><button class="icon-btn" data-a="back-editor">${I.back}</button><h3>${head}<div class="sub">${S.recState==="ready"?"Top 10 picks for your Status":"Music suggestions"}${S.lang?` · ${S.lang}`:""}</div></h3></div>
+   <div class="scroll" id="recScroll">${body}</div></div>`;
+};
+function trackRow(r,i){
+  const t=r.t, c=S.ctx;
+  const fit = t.occasion_tags.includes(c.occasion);
+  const trending = t.trend_score>=78;
+  const pct=k=>Math.round((W[k]*r.parts[k]/r.wsum)*100);
+  const why = S.showWhy || S.whyOpen[t.id];
+  return `<div class="track">
+   <div class="rank">${i+1}</div>${art(t)}
+   <div class="tinfo"><div class="tt">${esc(t.title)}</div><div class="aa">${esc(t.artist)} · ${t.language}</div>
+    <div class="tags">${fit?`<span class="tag fit">Fits ${OCC[c.occasion].label.split(" ")[0].replace("&","")}</span>`:""}${trending?`<span class="tag trend">↑ Trending (illustrative)</span>`:""}<span class="tag">${t.mood_tags[0]}</span><button class="tag why" data-a="why" data-id="${t.id}">why?</button></div>
+    ${why?`<div class="breakdown">Occasion ${pct("occasion")} · Mood ${pct("mood")}${c.language?` · Language ${pct("language")}`:""} · Popularity ${pct("trend")} = ${Math.round(r.score*100)}${S.refresh?" (incl. refresh variety)":""}${c.language?"":" · language unknown → re-weighted"}</div>`:""}
+   </div>
+   <button class="play ${S.playing===t.id?"on":""}" data-a="preview" data-id="${t.id}" title="Simulated preview">${S.playing===t.id?I.pause:I.play}</button>
+   <button class="sel-btn" data-a="select" data-id="${t.id}">Select</button>
+  </div>`;
+}
+
+V.manual=()=>{
+  const q=S.searchQ.trim().toLowerCase();
+  const list=q?CATALOGUE.filter(t=>(t.title+" "+t.artist+" "+t.language).toLowerCase().includes(q)):[...CATALOGUE].sort((a,b)=>a.title.localeCompare(b.title));
+  return `<div class="screen">
+   <div class="top"><button class="icon-btn" data-a="back-editor">${I.back}</button><h3>Search music<div class="sub">Browse the sample catalogue yourself</div></h3></div>
+   <div class="search">${I.search}<input id="q" placeholder="Song, artist or language" value="${esc(S.searchQ)}" autocomplete="off"></div>
+   <div class="scroll" id="mlist">${manualList(list)}</div>
+   <div class="foot" style="flex-direction:row"><button class="btn line" data-a="open-assistant">✨ Get suggestions</button></div></div>`;
+};
+function manualList(list){
+  if(!list.length) return `<div class="empty">No songs match “${esc(S.searchQ)}”.<br>Try another word, or get suggestions instead.</div>`;
+  return list.map(t=>`<div class="track">${art(t)}<div class="tinfo"><div class="tt">${esc(t.title)}</div><div class="aa">${esc(t.artist)} · ${t.language}</div></div>
+   <button class="play ${S.playing===t.id?"on":""}" data-a="preview" data-id="${t.id}">${S.playing===t.id?I.pause:I.play}</button>
+   <button class="sel-btn" data-a="select" data-id="${t.id}">Select</button></div>`).join("");
+}
+
+V.segment=()=>{
+  const t=S.track; const bars=64;
+  const h=i=>20+((hash(t.id+i)%80));
+  const s0=S.segStart/t.duration*bars, s1=(S.segStart+S.segLen)/t.duration*bars, pl=s0+(S.segPlay/S.segLen)*(s1-s0);
+  return `<div class="screen">
+   <div class="top"><button class="icon-btn" data-a="back-from-seg">${I.back}</button><h3>Choose a part<div class="sub">Drag the box to pick ${S.segLen} seconds</div></h3></div>
+   <div class="scroll">
+    <div class="seg-hero">${art(t,132)}<div class="tt">${esc(t.title)}</div><div class="aa">${esc(t.artist)} · ${t.language}</div>
+     <span class="sim-badge">🔇 Simulated preview — no audio is played</span></div>
+    <div class="wave-wrap" id="wave">
+     <div class="wave">${Array.from({length:bars},(_,i)=>`<i class="${i>=s0&&i<s1?(S.segPlay&&i<pl?"played":"in"):""}" style="height:${h(i)}%"></i>`).join("")}</div>
+     <div class="window" id="win" style="left:${S.segStart/t.duration*100}%;width:${S.segLen/t.duration*100}%"></div>
+    </div>
+    <div class="seg-times"><span>0:00</span><b style="color:var(--ink)">${fmt(S.segStart)} – ${fmt(S.segStart+S.segLen)}</b><span>${fmt(t.duration)}</span></div>
+    <div class="seg-ctrl">
+     <button class="nudge" data-a="nudge" data-d="-5">−5s</button>
+     <button class="big-play" data-a="seg-play">${playTimer?I.pause.replace(/16/g,"26"):I.play.replace(/16/g,"26")}</button>
+     <button class="nudge" data-a="nudge" data-d="5">+5s</button>
+    </div>
+    <div class="seg-len">${[15,30].map(n=>`<button class="chip ${S.segLen===n?"sel":""}" data-a="seglen" data-n="${n}">${n} sec</button>`).join("")}</div>
+   </div>
+   <div class="foot"><button class="btn primary" data-a="confirm-seg">Use this part</button><button class="btn ghost" data-a="back-from-seg">Back to ${S.from==="manual"?"search":"recommendations"}</button></div></div>`;
+};
+
+V.preview=()=>`
+ <div class="screen dark viewer">
+  ${mediaHTML()}
+  <div class="bars"><i></i></div>
+  <div class="viewer-head"><button class="icon-btn" style="color:#fff" data-a="back-editor">${I.back}</button><div class="av" style="background:#8696A0">You</div><div><div style="font-weight:600">My status</div><div style="font-size:12px;opacity:.8">Preview</div></div></div>
+  ${S.track?`<div class="music-sticker" style="bottom:auto;top:84px">${art(S.track,36)}<div style="min-width:0"><div class="tt">${esc(S.track.title)}</div><div class="aa">${esc(S.track.artist)}</div></div></div>`:""}
+  <div class="preview-card">
+   ${S.caption?`<div style="font-size:15px;margin-bottom:6px">${esc(S.caption)}</div>`:""}
+   <b>Media:</b> ${S.media.type==="upload"?esc(S.media.name):S.media.label+" (placeholder)"}<br>
+   <b>Music:</b> ${S.track?`${esc(S.track.title)} — ${esc(S.track.artist)} · ${fmt(S.segStart)}–${fmt(S.segStart+S.segLen)}`:"None"}
+  </div>
+  <div class="ed-bottom" style="justify-content:space-between">
+   <button class="ed-tool" data-a="edit-music">${I.music} Edit music</button>
+   <button class="ed-tool hl" data-a="publish" style="height:46px;padding:0 20px">Publish Status ${I.send.replace(/22/g,"18")}</button>
+  </div>
+  ${S.published?`<div class="modal-wrap"><div class="modal"><div class="ok">${I.check}</div><h4>Publish simulated</h4><p>This is a prototype. <b>Nothing was posted to WhatsApp</b> — your Status, media and song choice exist only in this browser tab.</p><button class="btn primary" data-a="done">Done</button><button class="btn ghost" data-a="restart">Create another</button></div></div>`:""}
+ </div>`;
+
+/* ---------- Render + events ---------- */
+const STEPS=[["home","Status list"],["setup","Choose media"],["editor","Add music · occasion"],["recs","Recommendations"],["segment","Pick segment"],["preview","Preview & publish"]];
+function renderSteps(){
+  const order={home:0,setup:1,editor:2,manual:3,recs:3,segment:4,preview:5};
+  const cur=order[S.screen];
+  $("#steps").innerHTML=STEPS.map(([k,l],i)=>`<li class="${i<cur?"done":i===cur?"now":""}"><span class="n">${i<cur?"✓":i+1}</span>${l}${k==="recs"&&S.screen==="manual"?" (manual search)":""}</li>`).join("");
+  document.querySelectorAll("[data-tg]").forEach(b=>b.classList.toggle("on",!!S[b.dataset.tg]));
+}
+function render(){
+  const keepScroll=app.querySelector(".scroll")?.scrollTop||0;
+  const same=app.dataset.screen===S.screen;
+  app.innerHTML=V[S.screen]();
+  app.dataset.screen=S.screen;
+  if(same){const sc=app.querySelector(".scroll"); if(sc) sc.scrollTop=keepScroll; app.querySelector(".screen").style.animation="none"}
+  if(S.menu){app.insertAdjacentHTML("beforeend",`<div class="menu" data-stop>
+    <div class="toggle"><span>Simulate AI failure</span><button class="switch ${S.llmFail?"on":""}" data-tg="llmFail"></button></div>
+    <div class="toggle"><span>Show score breakdown</span><button class="switch ${S.showWhy?"on":""}" data-tg="showWhy"></button></div>
+    <button class="mi" data-a="about">About this prototype</button></div>`)}
+  bindInputs(); renderSteps();
+}
+function bindInputs(){
+  const f=$("#file");
+  if(f) f.onchange=e=>{const file=e.target.files[0]; if(!file) return;
+    if(!/^(image|video)\//.test(file.type)){toast("Please choose an image or video");return}
+    if(S.media?.url) URL.revokeObjectURL(S.media.url);
+    S.media={type:"upload",url:URL.createObjectURL(file),name:file.name,kind:file.type.startsWith("video")?"video":"image"};render()};
+  const o=$("#other");
+  if(o){o.oninput=e=>{S.otherText=e.target.value;S.otherErr="";$("#cnt").textContent=S.otherText.length+"/160";
+      const h=$("#otherHelp");h.classList.remove("err");h.textContent="Describe it in a few words. Only this text is used.";
+      const b=app.querySelector('[data-a="get-recs"]'); b.disabled=!S.otherText.trim()};
+    if(document.activeElement!==o && S.focusOther){o.focus();o.setSelectionRange(o.value.length,o.value.length);S.focusOther=false}}
+  const q=$("#q");
+  if(q){q.oninput=e=>{S.searchQ=e.target.value;const qq=S.searchQ.trim().toLowerCase();
+     $("#mlist").innerHTML=manualList(qq?CATALOGUE.filter(t=>(t.title+" "+t.artist+" "+t.language).toLowerCase().includes(qq)):[...CATALOGUE].sort((a,b)=>a.title.localeCompare(b.title)))}}
+  const cap=$("#cap"); if(cap) cap.oninput=e=>S.caption=e.target.value;
+  const win=$("#win"), wave=$("#wave");
+  if(win){
+    let startX=0,startSeg=0;
+    const move=e=>{const x=(e.touches?e.touches[0].clientX:e.clientX); const w=wave.getBoundingClientRect().width;
+      const d=(x-startX)/w*S.track.duration; S.segStart=Math.round(Math.max(0,Math.min(S.track.duration-S.segLen,startSeg+d)));
+      win.style.left=S.segStart/S.track.duration*100+"%"; app.querySelector(".seg-times b").textContent=`${fmt(S.segStart)} – ${fmt(S.segStart+S.segLen)}`};
+    const up=()=>{window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",up);stopPlay();render()};
+    win.onpointerdown=e=>{e.preventDefault();startX=e.clientX;startSeg=S.segStart;window.addEventListener("pointermove",move);window.addEventListener("pointerup",up)};
+    wave.onclick=e=>{if(e.target===win)return;const r=wave.getBoundingClientRect();
+      S.segStart=Math.round(Math.max(0,Math.min(S.track.duration-S.segLen,(e.clientX-r.left)/r.width*S.track.duration-S.segLen/2)));stopPlay();render()};
+  }
+}
+function stopPlay(){if(playTimer){clearInterval(playTimer);playTimer=null}S.playing=null;S.segPlay=0}
+
+async function runRecs(){
+  stopPlay(); S.screenSheet=false; S.screen="recs"; S.recState="loading"; S.refresh=0; S.whyOpen={}; render();
+  if(S.occ==="other"){
+    try{
+      const it=await interpretIntent(S.otherText.trim());
+      if(it.vague){S.vague=it.suggestions;S.recState="vague";S.ctx={custom:S.otherText.trim()};render();return}
+      applyIntent(it);
+    }catch(e){S.recState="error";S.ctx={custom:S.otherText.trim()};render();return}
+  } else {
+    await new Promise(r=>setTimeout(r,450));
+    const o=OCC[S.occ]; S.intent=null;
+    S.ctx={occasion:o.key,mood:o.mood,energy:o.energy,language:S.lang};
+  }
+  S.recs=recommend(S.ctx,0); S.recState="ready"; render();
+}
+function applyIntent(it){
+  S.intent=it; S.ctx={occasion:it.occasion,mood:it.mood,energy:it.energy,language:S.lang||it.language,custom:S.otherText.trim()};
+}
+
+app.addEventListener("click",e=>{
+  if(S.menu && !e.target.closest("[data-stop]") && !e.target.closest('[data-a="menu"]')){S.menu=false;render();return}
+  const tg=e.target.closest("[data-tg]"); if(tg){S[tg.dataset.tg]=!S[tg.dataset.tg];render();return}
+  const el=e.target.closest("[data-a]"); if(!el) return;
+  if(el.dataset.a==="close-sheet-bg" && e.target.closest("[data-stop]")) return;
+  const a=el.dataset.a, id=el.dataset.id;
+  switch(a){
+   case "menu": S.menu=!S.menu; render(); break;
+   case "about": S.menu=false; render(); toast("Concept prototype · fictional data · nothing is posted"); break;
+   case "home": go("home"); break;
+   case "create": case "restart":
+     Object.assign(S,{media:null,track:null,occ:null,otherText:"",lang:null,caption:"",published:false,screenSheet:false,ctx:null,intent:null,searchQ:""}); go("setup"); break;
+   case "search-manual-home": toast("Create a Status first, then add music"); break;
+   case "sample": S.media={type:"sample",...SAMPLES.find(s=>s.k===el.dataset.k)}; render(); break;
+   case "setup": go("setup"); break;
+   case "to-editor": S.screenSheet=false; go("editor"); break;
+   case "open-assistant": stopPlay(); S.screen="editor"; S.screenSheet=true; render(); break;
+   case "close-sheet": case "close-sheet-bg": S.screenSheet=false; render(); break;
+   case "occ": S.occ=el.dataset.k; S.otherErr=""; if(S.occ==="other") S.focusOther=true; render(); break;
+   case "lang": S.lang=el.dataset.l||null; render(); break;
+   case "get-recs":
+     if(S.occ==="other"){S.otherText=S.otherText.replace(/\s+/g," ").trim();
+       if(!S.otherText){S.otherErr="Please describe your Status in a few words.";render();return}}
+     runRecs(); break;
+   case "retry": runRecs(); break;
+   case "use-rules": {const it=interpretRuleBased(S.otherText.trim());
+     if(it.vague){S.vague=it.suggestions;S.recState="vague";render();break}
+     applyIntent({...it,source:"rules"}); S.recs=recommend(S.ctx,0); S.recState="ready"; render(); break;}
+   case "pick-sugg": S.occ=el.dataset.k; runRecs(); break;
+   case "change": stopPlay(); S.screen="editor"; S.screenSheet=true; if(S.occ==="other") S.focusOther=true; render(); break;
+   case "manual": stopPlay(); S.screenSheet=false; go("manual"); break;
+   case "no-music": S.screenSheet=false; S.track=null; go("preview"); break;
+   case "back-editor": go("editor"); break;
+   case "refresh": S.refresh++; stopPlay(); S.recState="loading"; render();
+     setTimeout(()=>{S.recs=recommend(S.ctx,S.refresh);S.recState="ready";render();app.querySelector(".scroll").scrollTop=0;toast("Refreshed — showing a different mix")},400); break;
+   case "why": S.whyOpen[id]=!S.whyOpen[id]; render(); break;
+   case "preview":
+     if(S.playing===id){stopPlay();render();break}
+     stopPlay(); S.playing=id; render(); toast("Simulated preview — no audio plays in this prototype");
+     playTimer=setTimeout(()=>{playTimer=null;S.playing=null;render()},6000); break;
+   case "select": {stopPlay(); S.from=S.screen; S.track=CATALOGUE.find(t=>t.id===id);
+     S.segLen=15; S.segStart=Math.min(Math.round(S.track.duration*0.3),S.track.duration-S.segLen); go("segment"); break;}
+   case "back-from-seg": go(S.from==="manual"?"manual":"recs"); break;
+   case "nudge": S.segStart=Math.max(0,Math.min(S.track.duration-S.segLen,S.segStart+Number(el.dataset.d))); stopPlay(); render(); break;
+   case "seglen": S.segLen=Number(el.dataset.n); S.segStart=Math.min(S.segStart,S.track.duration-S.segLen); stopPlay(); render(); break;
+   case "seg-play":
+     if(playTimer){stopPlay();render();break}
+     S.segPlay=0; playTimer=setInterval(()=>{S.segPlay+=0.5; if(S.segPlay>=S.segLen){stopPlay()} render()},500); render(); break;
+   case "confirm-seg": go("editor"); toast("Music added to your Status"); break;
+   case "to-preview": go("preview"); break;
+   case "edit-music": stopPlay(); S.screen="editor"; S.screenSheet=true; render(); break;
+   case "publish": S.published=true; render(); break;
+   case "done": S.posted=true; S.published=false; go("home"); break;
+  }
+});
+document.querySelector(".side").addEventListener("click",e=>{const tg=e.target.closest("[data-tg]");if(tg){S[tg.dataset.tg]=!S[tg.dataset.tg];render()}});
+render();
+</script>
+</body>
+</html>
